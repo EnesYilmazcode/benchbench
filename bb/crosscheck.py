@@ -1,12 +1,12 @@
 """A third vote from another model family on every item the audit flagged.
 
 The audit's two auditors are both Claude models. Each flagged item (except executed weak-test
-findings, which are measured) goes to DeepSeek V4 Pro, which sees the item and the same evidence
+findings, which are measured) goes to Codex (GPT-5.6), which sees the item and the same evidence
 the reviewers saw but not their verdicts. Its vote is stored next to the result; the report
 counts how many flags it confirms.
 
-`python -X utf8 -m bb.crosscheck [bench ...]` updates runs/crosscheck.jsonl. Stops when the
-gateway balance drops under BB_GW_FLOOR dollars.
+`python -X utf8 -m bb.crosscheck [bench ...]` updates runs/crosscheck.jsonl. BB_CROSS=gw uses
+DeepSeek V4 Pro on the gateway instead, and stops when its balance drops under BB_GW_FLOOR dollars.
 """
 import json
 import os
@@ -22,6 +22,7 @@ from .report import ORDER, verdict
 
 OUT = ROOT / "runs" / "crosscheck.jsonl"
 FLOOR = float(os.environ.get("BB_GW_FLOOR", "0.3"))
+WHO = os.environ.get("BB_CROSS", "codex")
 
 
 def balance():
@@ -73,7 +74,7 @@ def main(benches):
             v = verdict(r)
             if v in FLAWED and v != "tests_weak" and r["id"] not in done:
                 todo.append((sample[r["id"]], r))
-    print(f"{len(todo)} flagged items to cross-check; balance ${balance():.2f}", flush=True)
+    print(f"{len(todo)} flagged items to cross-check with {WHO}" + (f"; balance ${balance():.2f}" if WHO == "gw" else ""), flush=True)
     lock = threading.Lock()
     stop = threading.Event()
 
@@ -82,7 +83,7 @@ def main(benches):
         if stop.is_set():
             return None
         p, files, trees = prompt_for(it, r)
-        return it["id"], ask("gw", p, REVIEW_SCHEMA, effort="high", files=files, trees=trees, timeout=900, tag=f"cross:{it['id']}")
+        return it["id"], ask(WHO, p, REVIEW_SCHEMA, effort="high", files=files, trees=trees, timeout=900, tag=f"cross:{it['id']}")
 
     with ThreadPoolExecutor(8) as pool:
         futs = [pool.submit(one, x) for x in todo]
@@ -97,6 +98,8 @@ def main(benches):
             with lock, OUT.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps({"id": res[0], "vote": res[1]}, ensure_ascii=False) + "\n")
             if n % 10 == 0:
+                print(f"  [{n}/{len(todo)}]", flush=True)
+            if WHO == "gw" and n % 10 == 0:
                 b = balance()
                 print(f"  [{n}/{len(todo)}] balance ${b:.2f}", flush=True)
                 if b < FLOOR:

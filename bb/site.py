@@ -41,8 +41,8 @@ def main():
     for f in findings:
         v = cross.get(f["id"])
         if v:
-            f["cross"] = "DeepSeek agrees" if v != "key_correct" and v != "unsure" else (
-                "DeepSeek disagrees" if v == "key_correct" else "DeepSeek unsure")
+            f["cross"] = "Codex agrees" if v != "key_correct" and v != "unsure" else (
+                "Codex disagrees" if v == "key_correct" else "Codex unsure")
     # Hard findings first, then weak tests; inside each, benchmarks in leaderboard order.
     rank = {r["bench"]: i for i, r in enumerate(sorted(summary, key=lambda r: -r["rate"]))}
     findings.sort(key=lambda f: (f["verdict"] == "tests_weak", rank.get(f["bench"], 99)))
@@ -82,7 +82,7 @@ def main():
             "<b>Judge.</b> When the two verdicts split, a third call (Opus at its highest effort) reads both, checks their claims and decides. An item counts as broken only if both reviewers or the judge say so.",
             "<b>Run the code.</b> For HumanEval, MBPP and BigCodeBench the official tests run in BigCodeBench's own evaluation image on Modal against the reference, two independent solutions, and two deliberately buggy ones. A bug that passes the tests and prints a different result from the reference on a valid input is a measured weak test.",
             "<b>Read the tasks.</b> SWE-bench, Terminal-Bench and tau2 tasks are reviewed with their real files in the auditor's folder: issue, gold patch and tests; the task folder; or the domain policy, database and tool code.",
-            "<b>Cross-check.</b> Every broken verdict on a question or task also went to DeepSeek V4 Pro, a model from another lab, which saw the evidence but not the verdicts. Its agreement is shown on each finding where it ran.",
+            "<b>Cross-check.</b> Every broken verdict on a question or task also went to Codex (GPT-5.6), a model from another lab, which saw the evidence but not the verdicts. Its agreement is shown on each finding where it ran.",
             "<b>Check the checker.</b> The same pipeline ran on MMLU-Redux items with human labels, above.",
         ],
         "footer": [
