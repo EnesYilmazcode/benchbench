@@ -142,7 +142,7 @@ def _gw(prompt, schema, model, effort, tools, workdir, timeout):
             + "\n\nYou have no tools in this session: reason it through yourself. Reply with only a JSON object matching "
               "this schema, no prose and no code fence:\n" + json.dumps(schema))
     req = {"model": model, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": body}],
-           "response_format": {"type": "json_object"}, "max_tokens": 32000,
+           "response_format": {"type": "json_object"}, "max_tokens": 16000,
            "reasoning": {"effort": {"low": "low", "medium": "medium"}.get(effort, "high")}}
     t0 = time.time()
     r = urllib.request.Request(GATEWAY, data=json.dumps(req).encode(), method="POST",
