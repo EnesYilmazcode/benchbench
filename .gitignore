@@ -1,0 +1,11 @@
+.env
+data/
+__pycache__/
+*.pyc
+runs/cache/
+runs/archive/
+runs/*.log
+runs/calls.jsonl
+# gated benchmarks: their terms forbid publishing items
+runs/results/gpqa_diamond.jsonl
+runs/results/hle.jsonl
