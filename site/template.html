@@ -1,0 +1,290 @@
+<title>benchbench</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="An audit of the questions, answer keys and tests of popular AI benchmarks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a grading sheet. One column of ruled rows, red pen for broken items, amber for weak tests. */
+:root {
+  --paper: #f3f5f7; --sheet: #ffffff; --ink: #172133; --muted: #5a6577; --rule: #d6dce4; --faint: #e9edf2;
+  --red: #c3362b; --red-soft: #f6dcd9; --amber: #a86a12; --amber-soft: #f5e6cc; --ok: #2c7a57; --ok-soft: #d8eee2;
+  --display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0e141e; --sheet: #141c29; --ink: #e5eaf1; --muted: #95a2b4; --rule: #2a3547; --faint: #1b2535;
+  --red: #f0695c; --red-soft: #3a1f1f; --amber: #e2a648; --amber-soft: #352a17; --ok: #5cbf8d; --ok-soft: #173025; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #0e141e; --sheet: #141c29; --ink: #e5eaf1; --muted: #95a2b4; --rule: #2a3547; --faint: #1b2535;
+  --red: #f0695c; --red-soft: #3a1f1f; --amber: #e2a648; --amber-soft: #352a17; --ok: #5cbf8d; --ok-soft: #173025; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16px/1.55 var(--body); margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 1040px; margin: 0 auto; padding-block: 40px 80px; display: grid; gap: 64px }
+a { color: inherit; text-decoration-color: var(--rule); text-underline-offset: 3px }
+a:hover { text-decoration-color: currentColor }
+h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: -0.01em }
+h1 { font-size: clamp(44px, 8vw, 84px); line-height: 0.98 }
+h2 { font-size: clamp(30px, 4.5vw, 42px); line-height: 1.05 }
+p { margin: 0; max-width: 66ch }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted) }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums }
+.lede { font-size: 19px; color: var(--muted) }
+.red { color: var(--red) } .amber { color: var(--amber) }
+
+header { display: grid; gap: 22px }
+header h1 em { font-style: italic; color: var(--red) }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule) }
+.fact { padding: 16px 18px 16px 0; display: grid; gap: 4px }
+.fact + .fact { padding-left: 18px; border-left: 1px solid var(--rule) }
+.fact b { font: 400 40px/1 var(--display) }
+.fact span { color: var(--muted); font-size: 14px }
+@media (max-width: 620px) { .fact + .fact { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule) } }
+
+section { display: grid; gap: 20px }
+.head { display: grid; gap: 10px }
+
+/* the leaderboard */
+.board { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; overflow-x: auto }
+.row { display: grid; grid-template-columns: minmax(150px, 1.25fr) 72px minmax(220px, 2.6fr) 86px 70px; align-items: center;
+  gap: 14px; padding: 11px 16px; border-top: 1px solid var(--faint); min-width: 640px }
+.row:first-child { border-top: 0 }
+.row.th { font: 500 11px/1.2 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-block: 12px }
+.row .name { font-weight: 500; line-height: 1.25 }
+.row .name small { display: block; color: var(--muted); font-weight: 400; font-size: 12px }
+.row .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 14px }
+.row .rate { color: var(--red); font-weight: 500 }
+.row button.name { all: unset; cursor: pointer; font-weight: 500; line-height: 1.25 }
+.row button.name:focus-visible { outline: 2px solid var(--red); outline-offset: 3px }
+.bar { position: relative; height: 22px }
+.bar .axis { position: absolute; inset: 10px 0 auto 0; height: 1px; background: var(--rule) }
+.bar .tick { position: absolute; top: 4px; width: 1px; height: 13px; background: var(--rule) }
+.bar .ci { position: absolute; top: 10px; height: 2px; background: var(--red); opacity: .35 }
+.bar .fill { position: absolute; top: 6px; height: 10px; left: 0; background: var(--red); border-radius: 0 2px 2px 0 }
+.bar .weak { position: absolute; top: 7px; width: 8px; height: 8px; margin-left: -4px; border: 2px solid var(--amber); border-radius: 50%; background: var(--sheet) }
+.scale { display: flex; justify-content: space-between; font: 11px var(--mono); color: var(--muted) }
+.legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px; color: var(--muted) }
+.legend i { display: inline-block; vertical-align: middle; margin-right: 6px }
+.legend .k1 { width: 18px; height: 8px; background: var(--red) }
+.legend .k2 { width: 18px; height: 2px; background: var(--red); opacity: .35 }
+.legend .k3 { width: 8px; height: 8px; border: 2px solid var(--amber); border-radius: 50% }
+
+/* check the checker */
+.check { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start }
+@media (max-width: 760px) { .check { grid-template-columns: 1fr } }
+.matrix { display: grid; grid-template-columns: auto 1fr 1fr; background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; font-size: 14px }
+.matrix > div { padding: 12px 14px; border-top: 1px solid var(--faint); border-left: 1px solid var(--faint) }
+.matrix .h { font: 500 11px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
+.matrix .v { font: 400 34px/1 var(--display) }
+.matrix .good { background: var(--ok-soft) } .matrix .bad { background: var(--red-soft) }
+.stat-list { display: grid; gap: 12px }
+.stat-list div { display: grid; grid-template-columns: 104px 1fr; gap: 14px; align-items: baseline }
+.stat-list b { font: 400 34px/1 var(--display) }
+
+/* findings */
+.filters { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: 500 13px var(--body); padding: 6px 12px; border-radius: 999px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.chip:focus-visible { outline: 2px solid var(--red); outline-offset: 2px }
+.list { display: grid; gap: 14px }
+.card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; padding: 18px 20px; display: grid; gap: 12px; min-width: 0 }
+.card .top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 13px }
+.pill { font: 500 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; padding: 5px 8px; border-radius: 3px }
+.pill.hard { background: var(--red-soft); color: var(--red) } .pill.weak { background: var(--amber-soft); color: var(--amber) }
+.card .id { color: var(--muted); font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere }
+.card pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.5 var(--body); max-height: 15em; overflow: auto }
+.card pre.code { font: 13px/1.5 var(--mono) }
+.answer { display: grid; grid-template-columns: 112px 1fr; gap: 6px 12px; font-size: 14px }
+.answer dt { color: var(--muted); font: 500 11px/1.9 var(--mono); text-transform: uppercase; letter-spacing: .05em }
+.answer dd { margin: 0; min-width: 0; overflow-wrap: anywhere }
+.answer .struck { text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px }
+.why { font-size: 15px; border-left: 2px solid var(--red); padding-left: 12px }
+.card.weakcard .why { border-left-color: var(--amber) }
+.withheld { color: var(--muted); font-style: italic; font-size: 14px }
+.more { justify-self: start }
+
+/* static checks */
+.bias { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px }
+.bias .card h3 { margin: 0; font: 500 15px var(--body) }
+.bars { display: grid; gap: 6px }
+.bars div { display: grid; grid-template-columns: 22px 1fr 52px; gap: 8px; align-items: center; font: 12px var(--mono) }
+.bars span.b { height: 10px; background: var(--ink); opacity: .78; border-radius: 0 2px 2px 0 }
+.bars span.b.hi { background: var(--red); opacity: 1 }
+
+.method ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; max-width: 72ch }
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--rule); padding-top: 18px; display: grid; gap: 6px }
+@media (prefers-reduced-motion: no-preference) { .bar .fill { transition: width .5s ease } }
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow" id="stamp">benchbench audit</div>
+    <h1>We graded the <em>graders</em>.</h1>
+    <p class="lede" id="lede">AI labs report scores on public benchmarks. Two AI auditors went through samples of 21 of them, question by question and test by test, and checked whether the official answers and tests are right.</p>
+    <div class="facts" id="facts"></div>
+  </header>
+
+  <section>
+    <div class="head">
+      <div class="eyebrow">The leaderboard</div>
+      <h2>How much of each benchmark is broken</h2>
+      <p>Share of sampled items with a wrong answer key, an ambiguous question, an unanswerable item, or a grader that rejects correct work. The thin line is the 95% interval. Coding benchmarks also get a second number: how often their tests let a plausible bug through.</p>
+    </div>
+    <div class="legend"><span><i class="k1"></i>broken items</span><span><i class="k2"></i>95% interval</span><span class="amber">Weak tests column: share of coding items whose tests accept a plausible bug</span></div>
+    <div class="board" id="board" role="table" aria-label="Benchmarks ranked by share of broken items"></div>
+  </section>
+
+  <section>
+    <div class="head">
+      <div class="eyebrow">Checking the checker</div>
+      <h2>Is the audit itself right?</h2>
+      <p id="checklede"></p>
+    </div>
+    <div class="check">
+      <div class="matrix" id="matrix"></div>
+      <div class="stat-list" id="checkstats"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <div class="eyebrow">Every finding</div>
+      <h2>The broken items</h2>
+      <p>Each one, with the official answer and the auditors' reasoning. Pick a benchmark to filter. Items from gated benchmarks (GPQA, Humanity's Last Exam) are listed by id only, as their terms ask.</p>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Filter findings by benchmark"></div>
+    <div class="list" id="list"></div>
+    <button class="chip more" id="more" type="button" hidden>Show more</button>
+  </section>
+
+  <section>
+    <div class="head">
+      <div class="eyebrow">Checks on every item</div>
+      <h2>Patterns no model was needed to find</h2>
+      <p>These run on whole benchmarks, not samples: where the right answer sits, whether the longest option gives it away, and duplicated questions.</p>
+    </div>
+    <div class="bias" id="bias"></div>
+  </section>
+
+  <section class="method">
+    <div class="head"><div class="eyebrow">Method</div><h2>How the audit works</h2></div>
+    <ol id="method"></ol>
+  </section>
+
+  <footer id="footer"></footer>
+</main>
+
+<script>
+const D = /*DATA*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const pct = (x, d = 1) => (100 * x).toFixed(d) + "%";
+const LABEL = {key_wrong: "wrong answer key", ambiguous: "ambiguous", unanswerable: "unanswerable", grader_flawed: "grader rejects correct work", tests_weak: "tests accept a bug"};
+
+function facts() {
+  const t = D.totals;
+  $("#stamp").textContent = `benchbench audit, ${D.date}`;
+  $("#facts").innerHTML = [
+    [t.audited.toLocaleString(), "items audited across " + D.summary.length + " benchmarks"],
+    [t.flagged.toLocaleString(), "found broken"],
+    [pct(t.median_rate, 0), "median share broken, per benchmark"],
+    [pct(D.validation.precision, 0), "of flags confirmed by human experts on a labelled test"],
+  ].map(([b, s]) => `<div class="fact"><b class="mono">${b}</b><span>${s}</span></div>`).join("");
+}
+
+function board() {
+  const rows = [...D.summary].sort((a, b) => b.rate - a.rate);
+  const max = Math.max(0.1, ...rows.map(r => r.ci95[1]));
+  const step = max > 0.3 ? 0.1 : 0.05;
+  const top = Math.ceil(max / step - 1e-9) * step;
+  const x = v => (100 * v / top).toFixed(2) + "%";
+  const ticks = [];
+  for (let k = 0; k * step <= top + 1e-9; k++) ticks.push(k * step);
+  let h = `<div class="row th" role="row"><span>Benchmark</span><span class="num">Broken</span><div class="scale">${ticks.map(v => `<span>${pct(v, 0)}</span>`).join("")}</div><span class="num">Audited</span><span class="num">Weak tests</span></div>`;
+  for (const r of rows) {
+    const weak = r.kind === "code" || r.tests_weak > 0;
+    h += `<div class="row" role="row">
+      <button class="name" type="button" data-b="${r.bench}" title="Show this benchmark's findings">${esc(r.name)}<small>${r.population ? r.population.toLocaleString() + " items in the benchmark" : ""}</small></button>
+      <span class="num rate">${pct(r.rate)}</span>
+      <div class="bar" aria-hidden="true"><div class="axis"></div>${ticks.map(v => `<div class="tick" style="left:${x(v)}"></div>`).join("")}
+        <div class="ci" style="left:${x(r.ci95[0])};width:calc(${x(r.ci95[1])} - ${x(r.ci95[0])})"></div>
+        <div class="fill" style="width:${x(r.rate)}"></div></div>
+      <span class="num">${r.flawed}/${r.decided}</span>
+      <span class="num amber">${weak ? pct(r.tests_weak_rate, 0) : "–"}</span></div>`;
+  }
+  $("#board").innerHTML = h;
+  $("#board").addEventListener("click", e => { const b = e.target.closest("[data-b]"); if (b) { pick(b.dataset.b); $("#filters").scrollIntoView({behavior: "smooth", block: "start"}); } });
+}
+
+function check() {
+  const v = D.validation;
+  $("#checklede").textContent = `MMLU-Redux is a set of MMLU questions that human experts re-checked by hand. We audited ${v.items} of them, ${v.broken} the experts marked broken and ${v.items - v.broken} they marked fine, without telling the auditors which were which.`;
+  $("#matrix").innerHTML = `<div></div><div class="h">Experts: broken</div><div class="h">Experts: fine</div>
+    <div class="h">Audit: broken</div><div class="v good">${v.tp}</div><div class="v bad">${v.fp}</div>
+    <div class="h">Audit: fine</div><div class="v">${v.fn}</div><div class="v good">${v.tn}</div>`;
+  $("#checkstats").innerHTML = [
+    [pct(v.precision, 0), `of the audit's flags match the experts. The ${v.fp} it raised on items the experts passed hold up on a reread: one asks for Python 3 output of a Python 2 print statement.`],
+    [`${v.wrong_caught}/${v.wrong_total}`, "wrong answer keys caught."],
+    [`${v.clarity_caught}/${v.clarity_total}`, "items the experts called unclearly worded were caught. The audit is cautious here, so every rate on this page is closer to a floor than a ceiling."],
+  ].map(([b, s]) => `<div><b class="mono">${b}</b><p>${esc(s)}</p></div>`).join("");
+}
+
+let current = "all", shown = 12;
+function filters() {
+  const counts = {};
+  for (const f of D.findings) counts[f.bench] = (counts[f.bench] || 0) + 1;
+  const names = Object.fromEntries(D.summary.map(r => [r.bench, r.name]));
+  const order = D.summary.filter(r => counts[r.bench]).sort((a, b) => counts[b.bench] - counts[a.bench]).map(r => r.bench);
+  $("#filters").innerHTML = `<button class="chip" type="button" data-f="all" aria-pressed="true">All (${D.findings.length})</button>` +
+    order.map(b => `<button class="chip" type="button" data-f="${b}" aria-pressed="false">${esc(names[b])} (${counts[b]})</button>`).join("");
+  $("#filters").addEventListener("click", e => { const c = e.target.closest("[data-f]"); if (c) pick(c.dataset.f); });
+  $("#more").addEventListener("click", () => { shown += 24; list(); });
+}
+function pick(b) {
+  current = b; shown = 12;
+  for (const c of document.querySelectorAll("#filters .chip")) c.setAttribute("aria-pressed", String(c.dataset.f === b));
+  try { localStorage.setItem("bb-filter", b) } catch (e) {}
+  list();
+}
+function card(f) {
+  const weak = f.verdict === "tests_weak";
+  const name = (D.summary.find(r => r.bench === f.bench) || {}).name || f.bench;
+  const code = /humaneval|mbpp|bigcodebench/.test(f.bench);
+  let body = "";
+  if (f.question === null) body = `<p class="withheld">Question withheld: this benchmark's terms ask that items not be published.</p>`;
+  else body = `<pre class="${code ? "code" : ""}">${esc(f.question)}</pre>`;
+  let ans = "";
+  if (f.official) ans += `<dt>Official</dt><dd class="${f.verdict === "key_wrong" ? "struck" : ""}">${esc(f.official)}</dd>`;
+  if (f.should_be) ans += `<dt>Auditors</dt><dd>${esc(f.should_be)}</dd>`;
+  return `<article class="card ${weak ? "weakcard" : ""}">
+    <div class="top"><span class="pill ${weak ? "weak" : "hard"}">${LABEL[f.verdict] || f.verdict}</span><b>${esc(name)}</b><span class="id">${esc(f.id)}</span>${f.cross ? `<span class="id">${esc(f.cross)}</span>` : ""}</div>
+    ${body}${ans ? `<dl class="answer">${ans}</dl>` : ""}
+    <p class="why">${esc(f.why)}</p></article>`;
+}
+function list() {
+  const all = D.findings.filter(f => current === "all" || f.bench === current);
+  $("#list").innerHTML = all.slice(0, shown).map(card).join("");
+  $("#more").hidden = all.length <= shown;
+}
+
+function bias() {
+  const out = [];
+  for (const b of D.bias) {
+    const mx = Math.max(...b.share);
+    out.push(`<div class="card"><h3>${esc(b.title)}</h3><p class="lede" style="font-size:14px">${esc(b.note)}</p>
+      <div class="bars">${b.share.map((s, i) => `<div><span>${"ABCDEFGHIJ"[i]}</span><span class="b ${s === mx && b.flag ? "hi" : ""}" style="width:${(100 * s / mx).toFixed(1)}%"></span><span>${pct(s)}</span></div>`).join("")}</div></div>`);
+  }
+  for (const n of D.notes) out.push(`<div class="card"><h3>${esc(n.title)}</h3><p style="font-size:15px">${esc(n.text)}</p></div>`);
+  $("#bias").innerHTML = out.join("");
+}
+
+function method() {
+  $("#method").innerHTML = D.method.map(m => `<li>${m}</li>`).join("");
+  $("#footer").innerHTML = D.footer.map(m => `<div>${m}</div>`).join("");
+}
+
+facts(); board(); check(); filters(); bias(); method();
+try { const s = localStorage.getItem("bb-filter"); if (s && (s === "all" || D.findings.some(f => f.bench === s))) pick(s); else list(); } catch (e) { list(); }
+</script>

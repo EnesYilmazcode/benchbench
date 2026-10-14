@@ -5,6 +5,8 @@ flagged item with its verdict and the auditors' reasons) and prints the table.
 """
 import json
 import math
+import os
+import time
 from collections import Counter
 
 from . import data
@@ -66,7 +68,7 @@ def main():
             continue
         rows = [json.loads(l) for l in p.open(encoding="utf-8")]
         sample = {it["id"]: it for it in data.sample(b)}
-        if len(rows) < len(sample):
+        if len(rows) < len(sample) and not os.environ.get("BB_PARTIAL"):
             print(f"{b}: only {len(rows)} of {len(sample)} audited, left out of the table")
             continue
         v = Counter(verdict(r) for r in rows)
@@ -87,6 +89,8 @@ def main():
                                  "question": None if gated else show_question(it)[:1500] if it["kind"] in ("mcq", "short") else it["question"][:600],
                                  "official": None if gated else (show_key(it) if it["kind"] in ("mcq", "short") else None),
                                  "should_be": fix, "why": why, "evidence": ev})
+    (OUT / "meta.json").write_text(json.dumps({"date": time.strftime("%Y-%m-%d"), "partial": bool(os.environ.get("BB_PARTIAL"))}),
+                                   encoding="utf-8")
     (OUT / "summary.json").write_text(json.dumps(table, indent=1, ensure_ascii=False), encoding="utf-8")
     with (OUT / "findings.jsonl").open("w", encoding="utf-8") as f:
         for x in findings:
