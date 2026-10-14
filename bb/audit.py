@@ -11,6 +11,7 @@ Code, SWE and agent tasks have their own first steps (bb/code.py, bb/tasks.py) a
 """
 import argparse
 import json
+import os
 import re
 import sys
 import threading
@@ -23,7 +24,7 @@ from .agents import ask
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "runs" / "results"
-AUDITORS = ("claude", "codex")
+AUDITORS = ("claude", os.environ.get("BB_SECOND", "gw"))  # Claude Code (tools, web) and an independent model
 
 NAMES = {
     "mmlu": "MMLU", "mmlu_redux_val": "MMLU", "mmlu_pro": "MMLU-Pro", "gpqa_diamond": "GPQA Diamond", "arc_challenge": "ARC-Challenge",
@@ -162,7 +163,7 @@ def _sound(v):
 
 def judge(it, context, reviews, files=None, trees=None, **kw):
     """Settle a split between the two reviews with a third, stronger call."""
-    a, b = reviews["claude"], reviews["codex"]
+    a, b = (reviews[w] for w in AUDITORS)
     if _sound(a) and _sound(b):
         return {"verdict": "key_correct", "by": "both"}
     if a["verdict"] in FLAWED and b["verdict"] in FLAWED:
