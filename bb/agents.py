@@ -15,6 +15,9 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+for _line in (ROOT / ".env").read_text().splitlines() if (ROOT / ".env").exists() else []:
+    if "=" in _line and not _line.startswith("#"):
+        os.environ.setdefault(*(x.strip() for x in _line.split("=", 1)))
 CACHE = ROOT / "runs" / "cache"
 CLAUDE = shutil.which("claude") or "claude"
 CODEX = shutil.which("codex") or "codex"
@@ -104,13 +107,80 @@ def _codex(prompt, schema, model, effort, tools, workdir, timeout):
     return ans, {"ms": int((time.time() - t0) * 1000), "tokens": tok}
 
 
-RUNNERS = {"claude": _claude, "codex": _codex}
-MODELS = {"claude": os.environ.get("BB_CLAUDE_MODEL", "opus"), "codex": os.environ.get("BB_CODEX_MODEL", "gpt-5.6-sol")}
+GATEWAY = "https://ai-gateway.vercel.sh/v1/chat/completions"
+TEXT_SUFFIXES = {".md", ".txt", ".py", ".sh", ".toml", ".json", ".patch", ".yaml", ".yml", ".cfg", ".r", ".R", ".c", ".js",
+                 ".ts", ".rs", ".go", ".java", ".cpp", ".h", ".csv", ".html", ".sql", ".ini", ""}
 
 
-def ask(who, prompt, schema, *, effort="medium", tools=(), files=None, trees=None, timeout=900, tag="", retries=2):
+def _inline(workdir, budget=160_000):
+    """A model without a shell gets the folder's text files pasted in, smallest first, up to a budget."""
+    files = sorted((p for p in Path(workdir).rglob("*") if p.is_file() and not p.name.startswith(".")),
+                   key=lambda p: p.stat().st_size)
+    parts, used, skipped = [], 0, []
+    for p in files:
+        rel = p.relative_to(workdir).as_posix()
+        if p.suffix not in TEXT_SUFFIXES or p.stat().st_size > 60_000 or used + p.stat().st_size > budget:
+            skipped.append(f"{rel} ({p.stat().st_size} bytes)")
+            continue
+        text = p.read_text(encoding="utf-8", errors="replace")
+        parts.append(f"----- FILE {rel} -----\n{text}")
+        used += len(text)
+    out = "\n\n".join(parts)
+    if skipped:
+        out += "\n\n(Not shown, too large or binary: " + ", ".join(skipped[:40]) + ")"
+    return out
+
+
+def _gw(prompt, schema, model, effort, tools, workdir, timeout):
+    """A plain model behind Vercel's AI Gateway: no tools, the folder's files pasted into the prompt."""
+    import urllib.request
+    key = os.environ.get("AI_GATEWAY_API_KEY")
+    if not key:
+        raise AgentError("AI_GATEWAY_API_KEY is not set")
+    files = _inline(workdir) if any(Path(workdir).iterdir()) else ""
+    body = (prompt + ("\n\n=== THE FILES IN YOUR FOLDER ===\n" + files if files else "")
+            + "\n\nYou have no tools in this session: reason it through yourself. Reply with only a JSON object matching "
+              "this schema, no prose and no code fence:\n" + json.dumps(schema))
+    req = {"model": model, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": body}],
+           "response_format": {"type": "json_object"}, "max_tokens": 32000,
+           "reasoning": {"effort": {"low": "low", "medium": "medium"}.get(effort, "high")}}
+    t0 = time.time()
+    r = urllib.request.Request(GATEWAY, data=json.dumps(req).encode(), method="POST",
+                               headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(r, timeout=timeout) as resp:
+            out = json.loads(resp.read())
+    except Exception as e:
+        detail = getattr(e, "read", lambda: b"")()[:300]
+        raise AgentError(f"gateway: {e} {detail!r}")
+    text = (out["choices"][0]["message"].get("content") or "").strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1].rsplit("```", 1)[0]
+    try:
+        ans = json.loads(text)
+    except json.JSONDecodeError:
+        raise AgentError(f"gateway bad json: {text[:300]}")
+    missing = [k for k in schema.get("required", []) if k not in ans]
+    if missing:
+        raise AgentError(f"gateway answer missing {missing}")
+    enum = schema["properties"].get("verdict", {}).get("enum")
+    if enum and ans.get("verdict") not in enum:
+        raise AgentError(f"gateway verdict {ans.get('verdict')!r} not in schema")
+    u = out.get("usage") or {}
+    return ans, {"ms": int((time.time() - t0) * 1000), "in_tokens": u.get("prompt_tokens"),
+                 "out_tokens": u.get("completion_tokens"), "cost_usd": (out.get("usage") or {}).get("cost")}
+
+
+RUNNERS = {"claude": _claude, "codex": _codex, "gw": _gw}
+MODELS = {"claude": os.environ.get("BB_CLAUDE_MODEL", "opus"), "codex": os.environ.get("BB_CODEX_MODEL", "gpt-5.6-sol"),
+          "gw": os.environ.get("BB_GW_MODEL", "deepseek/deepseek-v4-pro")}
+FAST = {"claude": None, "codex": None, "gw": os.environ.get("BB_GW_FAST", "deepseek/deepseek-v4-flash")}  # first-pass calls
+_SLOTS["gw"] = threading.BoundedSemaphore(int(os.environ.get("BB_GW_JOBS", "12")))
+
+
+def ask(who, prompt, schema, *, effort="medium", tools=(), files=None, trees=None, timeout=900, tag="", retries=2, model=None):
     """One auditor call. `tools` for claude are tool names; for codex, "web" and/or "write" switch those on."""
-    model = MODELS[who]
+    model = model or MODELS[who]
     key = _key(who, model, effort, sorted(tools), prompt, schema, sorted((files or {}).items()),
                sorted((trees or {}).keys()), *(["shell-v2"] if who == "codex" and (files or trees) else []))
     cp = CACHE / key[:2] / f"{key}.json"
