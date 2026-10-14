@@ -171,11 +171,11 @@ def _gw(prompt, schema, model, effort, tools, workdir, timeout):
                  "out_tokens": u.get("completion_tokens"), "cost_usd": (out.get("usage") or {}).get("cost")}
 
 
-RUNNERS = {"claude": _claude, "codex": _codex, "gw": _gw}
+RUNNERS = {"claude": _claude, "sonnet": _claude, "codex": _codex, "gw": _gw}
 MODELS = {"claude": os.environ.get("BB_CLAUDE_MODEL", "opus"), "codex": os.environ.get("BB_CODEX_MODEL", "gpt-5.6-sol"),
-          "gw": os.environ.get("BB_GW_MODEL", "deepseek/deepseek-v4-pro")}
-FAST = {"claude": None, "codex": None, "gw": os.environ.get("BB_GW_FAST", "deepseek/deepseek-v4-flash")}  # first-pass calls
+          "gw": os.environ.get("BB_GW_MODEL", "deepseek/deepseek-v4-pro"), "sonnet": os.environ.get("BB_SONNET_MODEL", "sonnet")}
 _SLOTS["gw"] = threading.BoundedSemaphore(int(os.environ.get("BB_GW_JOBS", "12")))
+_SLOTS["sonnet"] = threading.BoundedSemaphore(int(os.environ.get("BB_SONNET_JOBS", "6")))
 
 
 def ask(who, prompt, schema, *, effort="medium", tools=(), files=None, trees=None, timeout=900, tag="", retries=2, model=None):

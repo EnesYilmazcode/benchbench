@@ -27,6 +27,23 @@ def wilson(k, n, z=1.96):
     return max(0.0, c - h), min(1.0, c + h)
 
 
+LOOSE = {"tests_weak", "grader_too_loose"}
+
+
+def verdict(r):
+    """The final verdict, with one correction: reviewers sometimes file 'tests too weak' under grader_flawed,
+    while their own issue tags say only that. Those count as weak tests."""
+    v = r["final"]["verdict"]
+    if v == "grader_flawed":
+        tags = set(r["final"].get("issues") or [])
+        for rv in r.get("review", {}).values():
+            if rv["verdict"] in FLAWED:
+                tags |= set(rv["issues"])
+        if tags and tags <= LOOSE:
+            return "tests_weak"
+    return v
+
+
 def reasons(r):
     """The clearest one-paragraph reason for a flag: the judge's, else the first flagging reviewer's."""
     f = r["final"]
@@ -52,7 +69,7 @@ def main():
         if len(rows) < len(sample):
             print(f"{b}: only {len(rows)} of {len(sample)} audited, left out of the table")
             continue
-        v = Counter(r["final"]["verdict"] for r in rows)
+        v = Counter(verdict(r) for r in rows)
         n = len(rows) - v["unsure"]
         hard = sum(v[k] for k in HARD)
         weak = v["tests_weak"]
@@ -62,11 +79,11 @@ def main():
                       "ci95": [lo, hi], "tests_weak": weak, "tests_weak_rate": weak / n if n else 0,
                       "unsure": v["unsure"], "verdicts": dict(v), "static": static.get(b, {})})
         for r in rows:
-            if r["final"]["verdict"] in FLAWED:
+            if verdict(r) in FLAWED:
                 it = sample[r["id"]]
                 why, fix, ev = reasons(r)
                 gated = it["meta"].get("gated", False)
-                findings.append({"id": r["id"], "bench": b, "verdict": r["final"]["verdict"], "by": r["final"].get("by"),
+                findings.append({"id": r["id"], "bench": b, "verdict": verdict(r), "by": r["final"].get("by"),
                                  "question": None if gated else show_question(it)[:1500] if it["kind"] in ("mcq", "short") else it["question"][:600],
                                  "official": None if gated else (show_key(it) if it["kind"] in ("mcq", "short") else None),
                                  "should_be": fix, "why": why, "evidence": ev})

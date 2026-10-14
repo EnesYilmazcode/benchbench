@@ -1,51 +1,50 @@
 items 120  unsure 0
              human: broken   human: fine
-we: flawed              24             2
-we: sound               36            58
-precision 0.92  recall 0.40  agreement 0.68
+we: flawed              25             2
+we: sound               35            58
+precision 0.93  recall 0.42  agreement 0.69
   bad_options_clarity          missed 5
   bad_question_clarity         missed 20
   bad_question_clarity         caught 6
-  multiple_correct_answers     missed 3
-  multiple_correct_answers     caught 1
+  multiple_correct_answers     missed 2
+  multiple_correct_answers     caught 2
   no_correct_answer            missed 5
   wrong_groundtruth            missed 3
   wrong_groundtruth            caught 17
-  DISAGREE mmlu_redux_val/electrical_engineering/77 bad_question_clarity key_correct solve
-  DISAGREE mmlu_redux_val/professional_accounting/39 no_correct_answer key_correct solve
-  DISAGREE mmlu_redux_val/human_sexuality/3 bad_question_clarity key_correct solve
-  DISAGREE mmlu_redux_val/logical_fallacies/95 bad_question_clarity key_correct solve
   DISAGREE mmlu_redux_val/human_aging/65 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/electrical_engineering/77 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/nutrition/43 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/professional_accounting/39 no_correct_answer key_correct solve
+  DISAGREE mmlu_redux_val/logical_fallacies/95 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/human_sexuality/3 bad_question_clarity key_correct both
   DISAGREE mmlu_redux_val/professional_law/16 bad_question_clarity key_correct solve
-  DISAGREE mmlu_redux_val/nutrition/43 bad_question_clarity key_correct both
   DISAGREE mmlu_redux_val/moral_scenarios/51 ok ambiguous both
-  DISAGREE mmlu_redux_val/human_aging/39 bad_question_clarity key_correct judge
+  DISAGREE mmlu_redux_val/logical_fallacies/20 no_correct_answer key_correct both
+  DISAGREE mmlu_redux_val/conceptual_physics/36 wrong_groundtruth key_correct both
   DISAGREE mmlu_redux_val/logical_fallacies/27 no_correct_answer key_correct solve
-  DISAGREE mmlu_redux_val/logical_fallacies/20 no_correct_answer key_correct judge
   DISAGREE mmlu_redux_val/astronomy/33 bad_options_clarity key_correct solve
-  DISAGREE mmlu_redux_val/virology/13 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/human_aging/39 bad_question_clarity key_correct both
   DISAGREE mmlu_redux_val/logical_fallacies/51 bad_question_clarity key_correct solve
   DISAGREE mmlu_redux_val/logical_fallacies/0 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/professional_accounting/22 no_correct_answer key_correct both
   DISAGREE mmlu_redux_val/formal_logic/85 multiple_correct_answers key_correct solve
-  DISAGREE mmlu_redux_val/logical_fallacies/3 bad_question_clarity key_correct solve
-  DISAGREE mmlu_redux_val/human_aging/71 bad_question_clarity key_correct both
-  DISAGREE mmlu_redux_val/conceptual_physics/36 wrong_groundtruth key_correct both
-  DISAGREE mmlu_redux_val/high_school_macroeconomics/63 bad_question_clarity key_correct both
+  DISAGREE mmlu_redux_val/high_school_macroeconomics/63 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/virology/13 bad_question_clarity key_correct both
   DISAGREE mmlu_redux_val/professional_law/31 bad_question_clarity key_correct solve
-  DISAGREE mmlu_redux_val/professional_accounting/22 no_correct_answer key_correct judge
-  DISAGREE mmlu_redux_val/high_school_computer_science/39 ok ambiguous both
-  DISAGREE mmlu_redux_val/professional_medicine/0 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/logical_fallacies/3 bad_question_clarity key_correct both
+  DISAGREE mmlu_redux_val/marketing/51 bad_options_clarity key_correct solve
+  DISAGREE mmlu_redux_val/high_school_computer_science/39 ok key_wrong both
   DISAGREE mmlu_redux_val/professional_law/66 bad_question_clarity key_correct solve
   DISAGREE mmlu_redux_val/professional_accounting/26 bad_options_clarity key_correct both
-  DISAGREE mmlu_redux_val/global_facts/1 wrong_groundtruth key_correct both
-  DISAGREE mmlu_redux_val/virology/34 wrong_groundtruth key_correct both
+  DISAGREE mmlu_redux_val/human_aging/71 bad_question_clarity key_correct both
   DISAGREE mmlu_redux_val/marketing/13 bad_options_clarity key_correct solve
   DISAGREE mmlu_redux_val/professional_accounting/36 no_correct_answer key_correct solve
-  DISAGREE mmlu_redux_val/marketing/51 bad_options_clarity key_correct judge
-  DISAGREE mmlu_redux_val/international_law/36 multiple_correct_answers key_correct solve
+  DISAGREE mmlu_redux_val/virology/34 wrong_groundtruth key_correct both
   DISAGREE mmlu_redux_val/jurisprudence/51 bad_options_clarity key_correct solve
-  DISAGREE mmlu_redux_val/global_facts/18 bad_question_clarity key_correct solve
-  DISAGREE mmlu_redux_val/world_religions/0 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/international_law/36 multiple_correct_answers key_correct solve
+  DISAGREE mmlu_redux_val/professional_medicine/0 bad_question_clarity key_correct both
+  DISAGREE mmlu_redux_val/global_facts/18 bad_question_clarity key_correct both
   DISAGREE mmlu_redux_val/logical_fallacies/52 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/world_religions/0 bad_question_clarity key_correct solve
+  DISAGREE mmlu_redux_val/college_chemistry/95 wrong_groundtruth key_correct both
   DISAGREE mmlu_redux_val/human_sexuality/2 bad_question_clarity key_correct judge
-  DISAGREE mmlu_redux_val/logical_fallacies/22 multiple_correct_answers key_correct judge

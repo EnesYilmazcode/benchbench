@@ -24,7 +24,7 @@ from .agents import ask
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "runs" / "results"
-AUDITORS = ("claude", os.environ.get("BB_SECOND", "gw"))  # Claude Code (tools, web) and an independent model
+AUDITORS = ("claude", os.environ.get("BB_SECOND", "sonnet"))  # Claude Code on Opus, and a second auditor
 
 NAMES = {
     "mmlu": "MMLU", "mmlu_redux_val": "MMLU", "mmlu_pro": "MMLU-Pro", "gpqa_diamond": "GPQA Diamond", "arc_challenge": "ARC-Challenge",
@@ -153,7 +153,7 @@ def review_prompt(it, context, verdicts=QUESTION_VERDICTS, body=None):
 
 def review(it, context, tools_claude, tools_codex, effort="high", files=None, trees=None, **kw):
     p = review_prompt(it, context, **kw)
-    return {who: ask(who, p, REVIEW_SCHEMA, effort=effort, tools=(tools_claude if who == "claude" else tools_codex),
+    return {who: ask(who, p, REVIEW_SCHEMA, effort=effort, tools=(tools_claude if who in ("claude", "sonnet") else tools_codex),
                      timeout=1200, files=files, trees=trees, tag=f"review:{it['id']}") for who in AUDITORS}
 
 
