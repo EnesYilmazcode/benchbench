@@ -24,6 +24,7 @@ from .agents import ask
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "runs" / "results"
+TIMEOUT = int(os.environ.get("BB_TIMEOUT", "1200"))  # seconds per auditor call; heavy agent tasks need more
 AUDITORS = ("claude", os.environ.get("BB_SECOND", "sonnet"))  # Claude Code on Opus, and a second auditor
 
 NAMES = {
@@ -154,7 +155,7 @@ def review_prompt(it, context, verdicts=QUESTION_VERDICTS, body=None):
 def review(it, context, tools_claude, tools_codex, effort="high", files=None, trees=None, **kw):
     p = review_prompt(it, context, **kw)
     return {who: ask(who, p, REVIEW_SCHEMA, effort=effort, tools=(tools_claude if who in ("claude", "sonnet") else tools_codex),
-                     timeout=1200, files=files, trees=trees, tag=f"review:{it['id']}") for who in AUDITORS}
+                     timeout=TIMEOUT, files=files, trees=trees, tag=f"review:{it['id']}") for who in AUDITORS}
 
 
 def _sound(v):
@@ -173,7 +174,7 @@ def judge(it, context, reviews, files=None, trees=None, **kw):
                        f"issues={r['issues']}; explanation={r['explanation']} evidence={r['evidence']}"
                        for n, r in (("1", a), ("2", b))))
     v = ask("claude", review_prompt(it, ctx, **kw) + "\nWeigh both reviews, check their claims yourself, and give the final verdict.",
-            REVIEW_SCHEMA, effort="xhigh", tools=("Bash", "Read", "Grep", "Glob", "WebSearch", "WebFetch"), timeout=1200,
+            REVIEW_SCHEMA, effort="xhigh", tools=("Bash", "Read", "Grep", "Glob", "WebSearch", "WebFetch"), timeout=TIMEOUT,
             files=files, trees=trees, tag=f"judge:{it['id']}")
     return {**v, "by": "judge"}
 
