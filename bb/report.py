@@ -8,7 +8,7 @@ import math
 from collections import Counter
 
 from . import data
-from .audit import FLAWED, NAMES, RESULTS, ROOT, show_key, show_question
+from .audit import AUDITORS, FLAWED, NAMES, RESULTS, ROOT, show_key, show_question
 
 OUT = ROOT / "results"
 HARD = {"key_wrong", "ambiguous", "unanswerable", "grader_flawed"}
@@ -32,7 +32,7 @@ def reasons(r):
     f = r["final"]
     if f.get("explanation"):
         return f["explanation"], f.get("correct_answer", ""), f.get("evidence", "")
-    for w in ("claude", "codex"):
+    for w in AUDITORS:
         v = r.get("review", {}).get(w)
         if v and v["verdict"] in FLAWED:
             return v["explanation"], v.get("correct_answer", ""), v.get("evidence", "")
