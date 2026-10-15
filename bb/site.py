@@ -29,6 +29,20 @@ def _validation():
             "clarity_total": total["bad_question_clarity"] + total["bad_options_clarity"]}
 
 
+def _timed_out(summary):
+    gone = [i.split("/", 1)[1] for r in summary for i in r.get("timed_out", [])]
+    if not gone:
+        return ""
+    return (f"{len(gone)} Terminal-Bench tasks ({', '.join(gone)}) are left out: the auditors tried to solve them "
+            "outright and ran past 40 minutes twice.")
+
+
+def _cross_coverage(findings):
+    need = [f for f in findings if f["verdict"] != "tests_weak"]
+    ran = sum(1 for f in need if f.get("cross"))
+    return f"({ran} of {len(need)})" if ran < len(need) else f"(all {len(need)})"
+
+
 def main():
     summary = json.loads((ROOT / "results/summary.json").read_text(encoding="utf-8"))
     findings = [json.loads(l) for l in (ROOT / "results/findings.jsonl").open(encoding="utf-8")]
@@ -80,9 +94,9 @@ def main():
             "<b>Solve blind.</b> Claude Opus 5.5 and Claude Sonnet 5.5, each run as Claude Code from the shell, answer every question without seeing the key, and say whether the item itself looks broken.",
             "<b>Review.</b> Any item where a solver disagrees with the key or flags it goes back to both, now with the key, a shell to compute in and the web to check facts. Each gives a verdict with its reasoning and sources.",
             "<b>Judge.</b> When the two verdicts split, a third call (Opus at its highest effort) reads both, checks their claims and decides. An item counts as broken only if both reviewers or the judge say so.",
-            "<b>Run the code.</b> For HumanEval, MBPP and BigCodeBench the official tests run in BigCodeBench's own evaluation image on Modal against the reference, two independent solutions, and two deliberately buggy ones. A bug that passes the tests and prints a different result from the reference on a valid input is a measured weak test.",
-            "<b>Read the tasks.</b> SWE-bench, Terminal-Bench and tau2 tasks are reviewed with their real files in the auditor's folder: issue, gold patch and tests; the task folder; or the domain policy, database and tool code.",
-            "<b>Cross-check.</b> Every broken verdict on a question or task also went to Codex (GPT-5.6), a model from another lab, which saw the evidence but not the verdicts. Its agreement is shown on each finding where it ran.",
+            "<b>Run the code.</b> For HumanEval and MBPP the official tests run in BigCodeBench's own evaluation image on Modal against the reference, two independent solutions, and two deliberately buggy ones. A bug that passes the tests and prints a different result from the reference on a valid input is a measured weak test.",
+            "<b>Read the tasks.</b> SWE-bench, Terminal-Bench and tau2 tasks are reviewed with their real files in the auditor's folder: issue, gold patch and tests; the task folder; or the domain policy, database and tool code. " + _timed_out(summary),
+            "<b>Cross-check.</b> Every broken verdict on a question or task also went to Codex (GPT-5.6), a model from another lab, which saw the evidence but not the verdicts. Its agreement is shown on each finding where it ran " + _cross_coverage(findings) + ".",
             "<b>Check the checker.</b> The same pipeline ran on MMLU-Redux items with human labels, above.",
         ],
         "footer": [
