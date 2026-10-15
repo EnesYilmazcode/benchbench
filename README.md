@@ -27,7 +27,7 @@ A benchmark joins the table only when every sampled item is audited. The one exc
 
 "Broken" means a wrong key, an ambiguous or unanswerable item, or a grader that rejects correct answers. "Weak tests" is the share of items whose tests accept a plausible wrong solution. For HumanEval and MBPP it is measured, not judged: deliberately buggy solutions pass the official tests and still print a different result from the reference on a valid input. For Terminal-Bench and SWE-bench Pro it is the reviewers' verdict after reading the tests.
 
-The full report, with every finding and the reasons behind it, is `docs/index.html`. Every flagged item is in `results/findings.jsonl`.
+The full report, with every finding and the reasons behind it, is at [enesyilmazcode.github.io/benchbench](https://enesyilmazcode.github.io/benchbench/) (source in `docs/index.html`). Every flagged item is in `results/findings.jsonl`.
 
 ## Examples
 
