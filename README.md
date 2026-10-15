@@ -6,6 +6,8 @@ Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answe
 
 ![Share of sampled items found broken in each benchmark](post/benchbench-chart.png)
 
+Dark red is a provably wrong answer key. Light red is everything else that counts as broken: an ambiguous or unanswerable question, or a test that rejects a reasonable answer. Those are judgment calls by the reviewers, each with its reasoning on the report page. The chart leaves out MATH-500, AIME 2025 and HMMT 2025 because nothing in them was found broken; they are in the table below.
+
 ## Results
 
 | Benchmark | Audited | Broken | Rate | 95% CI | Weak tests |
@@ -24,6 +26,13 @@ Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answe
 | MATH-500 | 150 | 0 | 0.0% | 0.0% to 2.5% |  |
 | AIME 2025 | 30 | 0 | 0.0% | 0.0% to 11.4% |  |
 | HMMT February 2025 | 30 | 0 | 0.0% | 0.0% to 11.4% |  |
+
+Why the sample sizes differ:
+
+- **150 items** for most benchmarks, picked at random. That keeps the 95% range to a few points on either side and the run to a night on a subscription.
+- **100 for SWE-bench Verified and SWE-bench Pro**, because each task means reading a real code repository, its issue, the fix and its tests, which takes many times longer than a question.
+- **Every item** of the small benchmarks: all 30 of AIME and HMMT, all 164 of HumanEval, and Terminal-Bench, which has 89.
+- Different sizes are fine: each row's 95% range already reflects its own sample size.
 
 A benchmark joins the table only when every sampled item is audited. The one exception is named in the code: three Terminal-Bench tasks (query-optimize, regex-chess, rstan-to-pystan) where the auditors tried to solve the task outright and ran past 40 minutes twice, so Terminal-Bench is 86 of 89.
 
