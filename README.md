@@ -6,7 +6,7 @@ Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answe
 
 ![Share of sampled items found broken in each benchmark](post/benchbench-chart-v2.png)
 
-Broken means a provably wrong answer key, or one of the judgment calls: an ambiguous or unanswerable question, or a test that rejects a reasonable answer. The judgment calls are judgment calls by the reviewers, each with its reasoning on the report page. MATH-500, AIME 2025 and HMMT 2025 show 0% because nothing in them was found broken.
+Broken means a provably wrong answer key, an ambiguous or unanswerable question, or a test that rejects a reasonable answer. All but the first are judgment calls by the reviewers, each with its reasoning on the report page. MATH-500, AIME 2025 and HMMT 2025 show 0% because nothing in them was found broken.
 
 ## Results
 
