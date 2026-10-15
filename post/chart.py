@@ -1,5 +1,6 @@
 """The X post image: one bar per benchmark, share of sampled items found broken, with its maker's logo."""
 import json
+import math
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -34,7 +35,7 @@ for i, v in enumerate(vals):
     ax.text(i, v + 0.4, f"{v:.0f}%" if v >= 1 else f"{v:.1f}%", ha="center", va="bottom",
             color=INK, fontsize=21, fontweight="semibold")
 
-ax.set_xlim(-0.6, len(vals) - 0.2)
+ax.set_xlim(-0.6, len(vals) + 0.05)
 ax.set_ylim(0, 23)
 ax.set_xticks([])
 ax.set_yticks([])
@@ -44,7 +45,7 @@ ax.axhline(0, color=BASE, lw=1.5)
 
 
 
-def logo(domain, box=36):
+def logo(domain, box=32):
     """The favicon with its white or transparent margin cut off, fitted into a box x box square."""
     im = Image.open(LOGOS / f"{domain}.png").convert("RGBA")
     flat = Image.new("RGBA", im.size, "white")
@@ -55,12 +56,17 @@ def logo(domain, box=36):
     return im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.LANCZOS)
 
 
+ANGLE = math.radians(35)
+DIR = (math.cos(ANGLE), -math.sin(ANGLE))  # the slant of the labels, in offset points
 for i, r in enumerate(rows):
+    # logo first, then the name, both on one line that starts under the bar and runs down to the right
+    lx, ly = -6, -24
     ax.add_artist(AnnotationBbox(OffsetImage(logo(MAKER[r["bench"]])), (i, 0), xycoords=("data", "axes fraction"),
-                                 xybox=(0, -26), boxcoords="offset points", frameon=False))
-    ax.annotate(SHORT.get(r["name"], r["name"]), (i, 0), xycoords=("data", "axes fraction"), xytext=(-4, -50),
-                textcoords="offset points", rotation=-35, rotation_mode="anchor", ha="left", va="top",
-                color=INK, fontsize=18)
+                                 xybox=(lx, ly), boxcoords="offset points", frameon=False))
+    gap = 26
+    ax.annotate(SHORT.get(r["name"], r["name"]), (i, 0), xycoords=("data", "axes fraction"),
+                xytext=(lx + gap * DIR[0], ly + gap * DIR[1]), textcoords="offset points", rotation=-35,
+                rotation_mode="anchor", ha="left", va="center", color=INK, fontsize=18)
 
 fig.text(0.04, 0.9, "What % of each AI benchmark is broken", color=INK, fontsize=36, fontweight="semibold")
 fig.text(0.975, 0.03, "enesyilmazcode.github.io/benchbench", color=MUTED, fontsize=15, ha="right")
