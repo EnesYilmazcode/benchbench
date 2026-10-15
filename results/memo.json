@@ -1,0 +1,83 @@
+{
+ "questions": 100,
+ "models": {
+  "claude": {
+   "orig": {
+    "fix": 75,
+    "key": 17,
+    "other": 8
+   },
+   "shuf": {
+    "fix": 75,
+    "key": 17,
+    "key_letter": 1,
+    "other": 7
+   }
+  },
+  "haiku": {
+   "orig": {
+    "fix": 75,
+    "key": 15,
+    "other": 10
+   },
+   "shuf": {
+    "fix": 73,
+    "key": 16,
+    "key_letter": 3,
+    "other": 8
+   }
+  },
+  "olmo2-7b": {
+   "orig": {
+    "fix": 50,
+    "key": 24,
+    "other": 26
+   },
+   "shuf": {
+    "fix": 45,
+    "key": 23,
+    "key_letter": 10,
+    "other": 22
+   }
+  },
+  "qwen2.5-7b": {
+   "orig": {
+    "fix": 60,
+    "key": 23,
+    "other": 17
+   },
+   "shuf": {
+    "fix": 59,
+    "key": 18,
+    "key_letter": 8,
+    "other": 15
+   }
+  },
+  "qwen3-8b": {
+   "orig": {
+    "fix": 62,
+    "key": 13,
+    "other": 25
+   },
+   "shuf": {
+    "fix": 60,
+    "key": 17,
+    "key_letter": 7,
+    "other": 16
+   }
+  },
+  "sonnet": {
+   "orig": {
+    "fix": 80,
+    "key": 12,
+    "other": 8
+   },
+   "shuf": {
+    "fix": 77,
+    "key": 14,
+    "key_letter": 3,
+    "other": 6
+   }
+  }
+ }
+}
