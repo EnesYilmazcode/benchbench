@@ -4,6 +4,7 @@ import math
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from matplotlib.patches import FancyBboxPatch
 from PIL import Image
@@ -52,21 +53,35 @@ def logo(domain, box=32):
     flat.alpha_composite(im)
     ink = flat.convert("L").point(lambda p: 255 if p < 245 else 0).getbbox()
     im = im.crop(ink) if ink else im
+    # near-white pixels go transparent, so a tilted favicon shows no white corners on the white page
+    px = np.array(im)
+    px[px[..., :3].min(-1) > 240, 3] = 0
+    im = Image.fromarray(px)
     k = box / max(im.size)
     return im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.LANCZOS)
 
 
 ANGLE = math.radians(35)
 DIR = (math.cos(ANGLE), -math.sin(ANGLE))  # the slant of the labels, in offset points
+renderer = fig.canvas.get_renderer()
+
+
+def width_pt(text, size):
+    t = fig.text(0, 0, text, fontsize=size)
+    w = t.get_window_extent(renderer).width * 72 / fig.dpi
+    t.remove()
+    return w
+
+
 for i, r in enumerate(rows):
-    # logo first, then the name, both on one line that starts under the bar and runs down to the right
-    lx, ly = -6, -24
-    ax.add_artist(AnnotationBbox(OffsetImage(logo(MAKER[r["bench"]])), (i, 0), xycoords=("data", "axes fraction"),
-                                 xybox=(lx, ly), boxcoords="offset points", frameon=False))
-    gap = 26
-    ax.annotate(SHORT.get(r["name"], r["name"]), (i, 0), xycoords=("data", "axes fraction"),
-                xytext=(lx + gap * DIR[0], ly + gap * DIR[1]), textcoords="offset points", rotation=-35,
-                rotation_mode="anchor", ha="left", va="center", color=INK, fontsize=18)
+    # name first, then the maker's logo, both tilted along one line that runs down to the right
+    name, x0, y0 = SHORT.get(r["name"], r["name"]), -2, -14
+    ax.annotate(name, (i, 0), xycoords=("data", "axes fraction"), xytext=(x0, y0), textcoords="offset points",
+                rotation=-35, rotation_mode="anchor", ha="left", va="center", color=INK, fontsize=18)
+    d = width_pt(name, 18) + 24
+    im = logo(MAKER[r["bench"]]).rotate(-35, expand=True, resample=Image.BICUBIC)
+    ax.add_artist(AnnotationBbox(OffsetImage(im), (i, 0), xycoords=("data", "axes fraction"),
+                                 xybox=(x0 + d * DIR[0], y0 + d * DIR[1]), boxcoords="offset points", frameon=False))
 
 fig.text(0.04, 0.9, "What % of each AI benchmark is broken", color=INK, fontsize=36, fontweight="semibold")
 fig.text(0.975, 0.03, "enesyilmazcode.github.io/benchbench", color=MUTED, fontsize=15, ha="right")
