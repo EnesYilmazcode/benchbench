@@ -85,7 +85,6 @@ for i, r in enumerate(rows):
 
 fig.text(0.04, 0.9, "What % of each AI benchmark is broken", color=INK, fontsize=36, fontweight="semibold")
 fig.text(0.04, 0.03, "Samples of 30 to 164 items each. Audited by Claude, cross-checked by Codex. A lower bound.", color=MUTED, fontsize=14)
-fig.text(0.975, 0.03, "enesyilmazcode.github.io/benchbench", color=MUTED, fontsize=14, ha="right")
 fig.subplots_adjust(left=0.04, right=0.98, top=0.84, bottom=0.3)
-fig.savefig(ROOT / "post/benchbench-chart-v2.png", facecolor=BG)
-print("post/benchbench-chart-v2.png")
+fig.savefig(ROOT / "post/benchbench-chart-v3.png", facecolor=BG)
+print("post/benchbench-chart-v3.png")

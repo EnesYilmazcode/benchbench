@@ -4,9 +4,9 @@ A benchmark for benchmarks. It audits the questions, answer keys and tests of po
 
 Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answer keys are wrong, that tenth means nothing. benchbench takes a random sample of each benchmark, has two Claude models solve and review every item without seeing each other's work, runs the code where there is code, and asks a model from another lab to check every flag.
 
-![Share of sampled items found broken in each benchmark](post/benchbench-chart-v2.png)
+![Share of sampled items found broken in each benchmark](post/benchbench-chart-v3.png)
 
-Broken means a provably wrong answer key, an ambiguous or unanswerable question, or a test that rejects a reasonable answer. All but the first are judgment calls by the reviewers, each with its reasoning on the report page. MATH-500, AIME 2025 and HMMT 2025 show 0% because nothing in them was found broken.
+Broken means a provably wrong answer key, an ambiguous or unanswerable question, or a test that rejects a reasonable answer. All but the first are judgment calls by the reviewers, each with its reasoning in `results/findings.jsonl`. MATH-500, AIME 2025 and HMMT 2025 show 0% because nothing in them was found broken.
 
 ## Results
 
@@ -46,7 +46,7 @@ What the columns mean:
 
 MMLU is sampled from the 5,700 questions (100 from each of its 57 subjects) that MMLU-Redux later re-checked by hand, scored against MMLU's original answer keys.
 
-The full report, with every finding and the reasons behind it, is at [enesyilmazcode.github.io/benchbench](https://enesyilmazcode.github.io/benchbench/) (source in `docs/index.html`). Every flagged item is in `results/findings.jsonl`.
+Every flagged item, with the reasons behind it, is in `results/findings.jsonl`.
 
 ## The benchmarks
 
