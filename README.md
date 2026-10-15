@@ -27,19 +27,45 @@ Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answe
 
 A benchmark joins the table only when every sampled item is audited. The one exception is named in the code: three Terminal-Bench tasks (query-optimize, regex-chess, rstan-to-pystan) where the auditors tried to solve the task outright and ran past 40 minutes twice, so Terminal-Bench is 86 of 89.
 
-"Broken" means a wrong key, an ambiguous or unanswerable item, or a grader that rejects correct answers. "Weak tests" is the share of items whose tests accept a plausible wrong solution. For HumanEval and MBPP it is measured, not judged: deliberately buggy solutions pass the official tests and still print a different result from the reference on a valid input. For Terminal-Bench and SWE-bench Pro it is the reviewers' verdict after reading the tests.
+What the columns mean:
+
+- **Audited**: how many items from the benchmark we checked, picked at random. An item is one question or one task.
+- **Broken**: how many of those items are wrong in a way that changes a model's score. That is one of four things: the official answer is wrong (wrong key), the question can reasonably be read more than one way (ambiguous), it cannot be answered from what it gives you (unanswerable), or the grader rejects a correct answer (grader flawed). An item counts only if both Claude reviewers agree, or a third judging call decides it after they split.
+- **Rate**: Broken divided by Audited.
+- **95% CI**: the range the true rate for the whole benchmark most likely falls in, given that we only checked a sample (a Wilson interval). Small samples give wide ranges, which is why AIME and HMMT show 0% but up to 11%.
+- **Weak tests**: only for benchmarks graded by tests. The share of items whose tests pass a solution that is actually wrong. It is counted separately and is not part of Broken. For HumanEval and MBPP it is measured: each auditor writes a deliberately wrong solution plus one input that shows the bug, we run both against the official tests on Modal, and if the wrong solution passes the tests while giving a different answer from the reference on that input, both reviewers check the input is a valid one. For Terminal-Bench and SWE-bench Pro it is the reviewers' verdict after reading the tests.
+
+MMLU is sampled from the 5,700 questions (100 from each of its 57 subjects) that MMLU-Redux later re-checked by hand, scored against MMLU's original answer keys.
 
 The full report, with every finding and the reasons behind it, is at [enesyilmazcode.github.io/benchbench](https://enesyilmazcode.github.io/benchbench/) (source in `docs/index.html`). Every flagged item is in `results/findings.jsonl`.
 
+## The benchmarks
+
+| Benchmark | What it tests | Made by |
+|---|---|---|
+| MBPP (Mostly Basic Python Problems) | short Python functions, graded by tests | Google |
+| Terminal-Bench 2.0 | multi-step tasks in a Linux terminal | Stanford and the Laude Institute |
+| SWE-bench Verified | fixing real GitHub issues in Python projects, graded by the project's tests | OpenAI, from Princeton's SWE-bench |
+| MMLU-Pro | harder 10-option version of MMLU | TIGER-Lab, University of Waterloo |
+| HumanEval | Python functions from a docstring, graded by tests | OpenAI |
+| SimpleQA | short factual questions with one answer | OpenAI |
+| tau2-bench | customer-service agent tasks against a simulated user and real tools | Sierra |
+| MMLU | multiple-choice exam questions in 57 subjects | UC Berkeley |
+| GSM8K | grade-school math word problems | OpenAI |
+| SWE-bench Pro | harder, longer real-repository coding tasks | Scale AI |
+| HellaSwag | picking the sensible ending of a short scenario | University of Washington and AI2 |
+| MATH-500 | competition math problems | OpenAI, from Berkeley's MATH |
+| AIME 2025, HMMT February 2025 | this year's high-school math competition problems | MAA, HMMT |
+
 ## Examples
 
-**GSM8K 952.** "Vince can staple 30 reports every 15 minutes. If he was stapling reports from 8:00 AM until 11:00 PM, how many reports did he staple?" The key says 360, which is three hours. 8 AM to 11 PM is fifteen hours, so the answer is 1800.
+**GSM8K (Grade School Math 8K, OpenAI's grade-school word problems) 952.** "Vince can staple 30 reports every 15 minutes. If he was stapling reports from 8:00 AM until 11:00 PM, how many reports did he staple?" The key says 360, which is three hours. 8 AM to 11 PM is fifteen hours, so the answer is 1800.
 
 **GSM8K 1309.** Kim raises $750, Alexandra $430, Maryam $700, Sarah $300. The key says 2280. The total is 2180; the key added Maryam's $400 difference in place of Sarah's $300.
 
-**HumanEval 97.** `multiply(a, b)` should return the product of the unit digits. The reference takes Python's modulo before `abs`, so `multiply(14, -12)` returns 32 instead of 8. The one negative test ends in 5, which hides the bug.
+**HumanEval (OpenAI's 164 Python coding problems, graded by unit tests) 97.** `multiply(a, b)` should return the product of the unit digits. The reference takes Python's modulo before `abs`, so `multiply(14, -12)` returns 32 instead of 8. The one negative test ends in 5, which hides the bug.
 
-**MMLU electrical engineering 17.** The feedback factor of a Wien bridge oscillator is 1/3. The key says 1/2.
+**MMLU (Massive Multitask Language Understanding, multiple-choice questions in 57 subjects) electrical engineering 17.** The feedback factor of a Wien bridge oscillator is 1/3. The key says 1/2.
 
 ## How it works
 
