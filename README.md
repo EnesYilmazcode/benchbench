@@ -4,9 +4,9 @@ A benchmark for benchmarks. It audits the questions, answer keys and tests of po
 
 Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answer keys are wrong, that tenth means nothing. benchbench takes a random sample of each benchmark, has two Claude models solve and review every item without seeing each other's work, runs the code where there is code, and asks a model from another lab to check every flag.
 
-![Share of sampled items found broken in each benchmark](post/benchbench-chart.png)
+![Share of sampled items found broken in each benchmark](post/benchbench-chart-v2.png)
 
-Dark red is a provably wrong answer key. Light red is everything else that counts as broken: an ambiguous or unanswerable question, or a test that rejects a reasonable answer. Those are judgment calls by the reviewers, each with its reasoning on the report page. MATH-500, AIME 2025 and HMMT 2025 show 0% because nothing in them was found broken.
+Broken means a provably wrong answer key, or one of the judgment calls: an ambiguous or unanswerable question, or a test that rejects a reasonable answer. The judgment calls are judgment calls by the reviewers, each with its reasoning on the report page. MATH-500, AIME 2025 and HMMT 2025 show 0% because nothing in them was found broken.
 
 ## Results
 

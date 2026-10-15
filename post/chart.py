@@ -30,14 +30,9 @@ ax.set_facecolor(BG)
 
 w = 0.62
 for i, r in enumerate(rows):
-    v, wrong = vals[i], 100 * r["verdicts"].get("key_wrong", 0) / r["audited"]
-    # whole bar in the light shade (unclear or unfair), then the wrong-answer share over its base in the dark one
+    v = vals[i]
     ax.add_patch(FancyBboxPatch((i - w / 2, -2), w, v + 2, boxstyle="round,pad=0,rounding_size=0.05",
-                                mutation_aspect=8, fc=SOFT, ec="none"))
-    if wrong:
-        ax.add_patch(plt.Rectangle((i - w / 2, -2), w, wrong + 2, fc=BAR, ec="none"))
-        if wrong < v:  # 2px gap between the two shades
-            ax.plot([i - w / 2, i + w / 2], [wrong, wrong], color=BG, lw=2, solid_capstyle="butt")
+                                mutation_aspect=8, fc=BAR, ec="none"))
     ax.text(i, v + 0.4, f"{v:.0f}%" if v >= 1 or v == 0 else f"{v:.1f}%", ha="center", va="bottom",
             color=INK, fontsize=21, fontweight="semibold")
 
@@ -89,11 +84,8 @@ for i, r in enumerate(rows):
                                  xybox=(x0 + d * DIR[0], y0 + d * DIR[1]), boxcoords="offset points", frameon=False))
 
 fig.text(0.04, 0.9, "What % of each AI benchmark is broken", color=INK, fontsize=36, fontweight="semibold")
-for x, c, label in ((0.042, BAR, "Wrong answer"), (0.19, SOFT, "Unclear question or unfair test")):
-    fig.patches.append(plt.Rectangle((x, 0.842), 0.012, 0.022, transform=fig.transFigure, fc=c, ec="none"))
-    fig.text(x + 0.018, 0.853, label, color=INK, fontsize=17, va="center")
 fig.text(0.04, 0.03, "Samples of 30 to 164 items each. Audited by Claude, cross-checked by Codex. A lower bound.", color=MUTED, fontsize=14)
 fig.text(0.975, 0.03, "enesyilmazcode.github.io/benchbench", color=MUTED, fontsize=14, ha="right")
-fig.subplots_adjust(left=0.04, right=0.98, top=0.8, bottom=0.3)
-fig.savefig(ROOT / "post/benchbench-chart.png", facecolor=BG)
-print("post/benchbench-chart.png")
+fig.subplots_adjust(left=0.04, right=0.98, top=0.84, bottom=0.3)
+fig.savefig(ROOT / "post/benchbench-chart-v2.png", facecolor=BG)
+print("post/benchbench-chart-v2.png")
