@@ -1,0 +1,485 @@
+[
+ {
+  "bench": "mmlu",
+  "name": "MMLU",
+  "kind": "mcq",
+  "audited": 150,
+  "decided": 150,
+  "population": 5700,
+  "flawed": 3,
+  "rate": 0.02,
+  "ci95": [
+   0.006824627715648315,
+   0.05714766586424165
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 147,
+   "key_wrong": 1,
+   "unanswerable": 1,
+   "ambiguous": 1
+  },
+  "static": {
+   "items": 5700,
+   "duplicate_questions": 59,
+   "duplicate_share": 0.0104,
+   "answer_in_question": 0,
+   "options": 4,
+   "n_with_k": 5700,
+   "answer_position": [
+    1298,
+    1398,
+    1458,
+    1546
+   ],
+   "position_share": [
+    0.228,
+    0.245,
+    0.256,
+    0.271
+   ],
+   "position_p": 4.3007918590238925e-05,
+   "longest_is_answer": 0.232,
+   "longest_chance": 0.25,
+   "all_none_of_above_share": 0.035,
+   "all_none_of_above_is_answer": 0.505,
+   "duplicate_options_share": 0.0144
+  }
+ },
+ {
+  "bench": "mmlu_pro",
+  "name": "MMLU-Pro",
+  "kind": "mcq",
+  "audited": 150,
+  "decided": 150,
+  "population": 12032,
+  "flawed": 17,
+  "rate": 0.11333333333333333,
+  "ci95": [
+   0.07197363837164525,
+   0.17400404256771052
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 133,
+   "ambiguous": 13,
+   "key_wrong": 3,
+   "unanswerable": 1
+  },
+  "static": {
+   "items": 12032,
+   "duplicate_questions": 402,
+   "duplicate_share": 0.0334,
+   "answer_in_question": 0,
+   "options": 10,
+   "n_with_k": 9981,
+   "answer_position": [
+    1048,
+    1002,
+    996,
+    1004,
+    968,
+    965,
+    1024,
+    995,
+    1034,
+    945
+   ],
+   "position_share": [
+    0.105,
+    0.1,
+    0.1,
+    0.101,
+    0.097,
+    0.097,
+    0.103,
+    0.1,
+    0.104,
+    0.095
+   ],
+   "position_p": 0.4053768809012842,
+   "longest_is_answer": 0.131,
+   "longest_chance": 0.1,
+   "all_none_of_above_share": 0.01,
+   "all_none_of_above_is_answer": 0.155,
+   "duplicate_options_share": 0.0469
+  }
+ },
+ {
+  "bench": "hellaswag",
+  "name": "HellaSwag",
+  "kind": "mcq",
+  "audited": 150,
+  "decided": 150,
+  "population": 10042,
+  "flawed": 1,
+  "rate": 0.006666666666666667,
+  "ci95": [
+   0.0011777710231334546,
+   0.036793752933975674
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 149,
+   "ambiguous": 1
+  },
+  "static": {
+   "items": 10042,
+   "duplicate_questions": 23,
+   "duplicate_share": 0.0023,
+   "answer_in_question": 0,
+   "options": 4,
+   "n_with_k": 10042,
+   "answer_position": [
+    2515,
+    2485,
+    2584,
+    2458
+   ],
+   "position_share": [
+    0.25,
+    0.247,
+    0.257,
+    0.245
+   ],
+   "position_p": 0.3185859654549448,
+   "longest_is_answer": 0.238,
+   "longest_chance": 0.25,
+   "all_none_of_above_share": 0.0,
+   "all_none_of_above_is_answer": 0.25,
+   "duplicate_options_share": 0.0
+  }
+ },
+ {
+  "bench": "gsm8k",
+  "name": "GSM8K",
+  "kind": "short",
+  "audited": 150,
+  "decided": 150,
+  "population": 1319,
+  "flawed": 3,
+  "rate": 0.02,
+  "ci95": [
+   0.006824627715648315,
+   0.05714766586424165
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 147,
+   "key_wrong": 3
+  },
+  "static": {
+   "items": 1319,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "math500",
+  "name": "MATH-500",
+  "kind": "short",
+  "audited": 150,
+  "decided": 150,
+  "population": 500,
+  "flawed": 0,
+  "rate": 0.0,
+  "ci95": [
+   0.0,
+   0.02497113914571871
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 150
+  },
+  "static": {
+   "items": 500,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 3
+  }
+ },
+ {
+  "bench": "aime2025",
+  "name": "AIME 2025",
+  "kind": "short",
+  "audited": 30,
+  "decided": 30,
+  "population": 30,
+  "flawed": 0,
+  "rate": 0.0,
+  "ci95": [
+   0.0,
+   0.113517091390478
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 30
+  },
+  "static": {
+   "items": 30,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "hmmt2025",
+  "name": "HMMT February 2025",
+  "kind": "short",
+  "audited": 30,
+  "decided": 30,
+  "population": 30,
+  "flawed": 0,
+  "rate": 0.0,
+  "ci95": [
+   0.0,
+   0.113517091390478
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 30
+  },
+  "static": {
+   "items": 30,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "simpleqa",
+  "name": "SimpleQA",
+  "kind": "short",
+  "audited": 150,
+  "decided": 150,
+  "population": 4326,
+  "flawed": 7,
+  "rate": 0.04666666666666667,
+  "ci95": [
+   0.02278625890187786,
+   0.09318757392357377
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 143,
+   "ambiguous": 4,
+   "key_wrong": 2,
+   "unanswerable": 1
+  },
+  "static": {
+   "items": 4326,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 3
+  }
+ },
+ {
+  "bench": "humaneval",
+  "name": "HumanEval",
+  "kind": "code",
+  "audited": 164,
+  "decided": 164,
+  "population": 164,
+  "flawed": 14,
+  "rate": 0.08536585365853659,
+  "ci95": [
+   0.05153006658636118,
+   0.13818213825439346
+  ],
+  "tests_weak": 127,
+  "tests_weak_rate": 0.774390243902439,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "tests_weak": 127,
+   "key_correct": 23,
+   "grader_flawed": 8,
+   "key_wrong": 5,
+   "ambiguous": 1
+  },
+  "static": {
+   "items": 164,
+   "duplicate_questions": 1,
+   "duplicate_share": 0.0061,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "mbpp",
+  "name": "MBPP (sanitized)",
+  "kind": "code",
+  "audited": 150,
+  "decided": 150,
+  "population": 257,
+  "flawed": 31,
+  "rate": 0.20666666666666667,
+  "ci95": [
+   0.1495880352139403,
+   0.27839503308488134
+  ],
+  "tests_weak": 78,
+  "tests_weak_rate": 0.52,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "tests_weak": 78,
+   "key_correct": 41,
+   "ambiguous": 2,
+   "grader_flawed": 17,
+   "key_wrong": 12
+  },
+  "static": {
+   "items": 257,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "swe_verified",
+  "name": "SWE-bench Verified",
+  "kind": "swe",
+  "audited": 100,
+  "decided": 100,
+  "population": 500,
+  "flawed": 15,
+  "rate": 0.15,
+  "ci95": [
+   0.09305903191162297,
+   0.23283733332157835
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 85,
+   "ambiguous": 4,
+   "grader_flawed": 11
+  },
+  "static": {
+   "items": 500,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "swe_pro",
+  "name": "SWE-bench Pro",
+  "kind": "swe",
+  "audited": 100,
+  "decided": 100,
+  "population": 642,
+  "flawed": 2,
+  "rate": 0.02,
+  "ci95": [
+   0.005501852234968185,
+   0.07001316294199365
+  ],
+  "tests_weak": 1,
+  "tests_weak_rate": 0.01,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 97,
+   "grader_flawed": 2,
+   "tests_weak": 1
+  },
+  "static": {
+   "items": 642,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "terminal_bench2",
+  "name": "Terminal-Bench 2.0",
+  "kind": "agent",
+  "audited": 86,
+  "decided": 86,
+  "population": 89,
+  "flawed": 17,
+  "rate": 0.19767441860465115,
+  "ci95": [
+   0.12724247137709888,
+   0.2939610690763213
+  ],
+  "tests_weak": 19,
+  "tests_weak_rate": 0.22093023255813954,
+  "unsure": 0,
+  "timed_out": [
+   "terminal_bench2/query-optimize",
+   "terminal_bench2/regex-chess",
+   "terminal_bench2/rstan-to-pystan"
+  ],
+  "verdicts": {
+   "ambiguous": 12,
+   "key_correct": 50,
+   "key_wrong": 1,
+   "tests_weak": 19,
+   "grader_flawed": 4
+  },
+  "static": {
+   "items": 89,
+   "duplicate_questions": 0,
+   "duplicate_share": 0.0,
+   "answer_in_question": 0
+  }
+ },
+ {
+  "bench": "tau2",
+  "name": "tau2-bench",
+  "kind": "agent",
+  "audited": 150,
+  "decided": 150,
+  "population": 278,
+  "flawed": 6,
+  "rate": 0.04,
+  "ci95": [
+   0.018458908886903574,
+   0.08451453912715763
+  ],
+  "tests_weak": 0,
+  "tests_weak_rate": 0.0,
+  "unsure": 0,
+  "timed_out": [],
+  "verdicts": {
+   "key_correct": 144,
+   "key_wrong": 1,
+   "ambiguous": 5
+  },
+  "static": {
+   "items": 278,
+   "duplicate_questions": 99,
+   "duplicate_share": 0.3561,
+   "answer_in_question": 0
+  }
+ }
+]
