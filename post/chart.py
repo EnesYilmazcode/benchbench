@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
 ROOT = Path(__file__).resolve().parent.parent
-BG, INK, MUTED, RULE, BAR = "#0e141e", "#e5eaf1", "#95a2b4", "#2a3547", "#f0695c"
+BG, INK, MUTED, RULE, BAR = "#ffffff", "#172133", "#5a6577", "#e3e7ed", "#d9473b"
 SHORT = {"MBPP (sanitized)": "MBPP", "Terminal-Bench 2.0": "Terminal-Bench 2", "HMMT February 2025": "HMMT 2025"}
 
 rows = sorted(json.loads((ROOT / "results/summary.json").read_text(encoding="utf-8")), key=lambda r: -r["rate"])
+rows = [r for r in rows if r["flawed"]]  # 0% bars carry no information on a phone
 names = [SHORT.get(r["name"], r["name"]) for r in rows]
 vals = [100 * r["rate"] for r in rows]
 
@@ -26,10 +27,10 @@ for i, v in enumerate(vals):
     ax.text(i, v + 0.5, f"{v:.0f}%" if v >= 1 or v == 0 else f"{v:.1f}%", ha="center", va="bottom",
             color=INK, fontsize=20, fontweight="bold")
 
-ax.set_xlim(-0.6, len(vals) - 0.4)
+ax.set_xlim(-0.6, len(vals) - 0.1)
 ax.set_ylim(0, 25)
 ax.set_xticks(range(len(names)))
-ax.set_xticklabels(names, rotation=35, ha="right", rotation_mode="anchor", color=INK, fontsize=19)
+ax.set_xticklabels(names, rotation=-35, ha="left", rotation_mode="anchor", color=INK, fontsize=19)
 ax.set_yticks([0, 5, 10, 15, 20, 25])
 ax.set_yticklabels([f"{t}%" for t in [0, 5, 10, 15, 20, 25]], color=MUTED, fontsize=17)
 ax.tick_params(length=0, pad=8)
@@ -39,10 +40,8 @@ for s in ax.spines.values():
     s.set_visible(False)
 ax.axhline(0, color=MUTED, lw=1.5)
 
-fig.text(0.055, 0.925, "How much of each AI benchmark is broken", color=INK, fontsize=34, fontweight="bold")
-fig.text(0.055, 0.875, "Share of sampled questions and tasks with a wrong answer, an ambiguous question, or a broken grader",
-         color=MUTED, fontsize=18)
+fig.text(0.055, 0.91, "What % of each AI benchmark is broken", color=INK, fontsize=38, fontweight="bold")
 fig.text(0.975, 0.025, "enesyilmazcode.github.io/benchbench", color=MUTED, fontsize=16, ha="right")
-fig.subplots_adjust(left=0.07, right=0.98, top=0.83, bottom=0.22)
+fig.subplots_adjust(left=0.07, right=0.98, top=0.86, bottom=0.22)
 fig.savefig(ROOT / "post/benchbench-chart.png", facecolor=BG)
 print("post/benchbench-chart.png")
