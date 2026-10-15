@@ -14,6 +14,9 @@ from .audit import AUDITORS, FLAWED, NAMES, RESULTS, ROOT, show_key, show_questi
 
 OUT = ROOT / "results"
 HARD = {"key_wrong", "ambiguous", "unanswerable", "grader_flawed"}
+# Items whose auditors ran past BB_TIMEOUT twice (40 minutes per call): they try to solve the task
+# outright. Listed by name so a benchmark missing only these still reports, and the gap shows.
+TIMED_OUT = {"terminal_bench2/query-optimize", "terminal_bench2/regex-chess", "terminal_bench2/rstan-to-pystan"}
 ORDER = ["mmlu", "mmlu_pro", "gpqa_diamond", "arc_challenge", "hellaswag", "truthfulqa", "commonsense_qa", "winogrande",
          "gsm8k", "math500", "aime2025", "hmmt2025", "simpleqa", "simpleqa_verified", "hle", "frontierscience",
          "humaneval", "mbpp", "bigcodebench", "swe_verified", "swe_pro", "terminal_bench2", "tau2"]
@@ -68,7 +71,8 @@ def main():
             continue
         rows = [json.loads(l) for l in p.open(encoding="utf-8")]
         sample = {it["id"]: it for it in data.sample(b)}
-        if len(rows) < len(sample) and not os.environ.get("BB_PARTIAL"):
+        missing = set(sample) - {r["id"] for r in rows}
+        if missing - TIMED_OUT and not os.environ.get("BB_PARTIAL"):
             print(f"{b}: only {len(rows)} of {len(sample)} audited, left out of the table")
             continue
         v = Counter(verdict(r) for r in rows)
@@ -79,7 +83,7 @@ def main():
         table.append({"bench": b, "name": NAMES[b], "kind": rows[0]["kind"], "audited": len(rows), "decided": n,
                       "population": static.get(b, {}).get("items"), "flawed": hard, "rate": hard / n if n else 0,
                       "ci95": [lo, hi], "tests_weak": weak, "tests_weak_rate": weak / n if n else 0,
-                      "unsure": v["unsure"], "verdicts": dict(v), "static": static.get(b, {})})
+                      "unsure": v["unsure"], "timed_out": sorted(missing), "verdicts": dict(v), "static": static.get(b, {})})
         for r in rows:
             if verdict(r) in FLAWED:
                 it = sample[r["id"]]
