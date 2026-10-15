@@ -16,11 +16,11 @@ SHORT = {"MBPP (sanitized)": "MBPP", "Terminal-Bench 2.0": "Terminal-Bench 2", "
 MAKER = {  # benchmark -> the organisation that published it
     "mbpp": "google.com", "terminal_bench2": "stanford.edu", "swe_verified": "openai.com", "mmlu_pro": "uwaterloo.ca",
     "humaneval": "openai.com", "simpleqa": "openai.com", "tau2": "sierra.ai", "mmlu": "berkeley.edu",
-    "gsm8k": "openai.com", "swe_pro": "scale.com", "hellaswag": "allenai.org",
+    "gsm8k": "openai.com", "swe_pro": "scale.com", "hellaswag": "allenai.org", "math500": "openai.com",
+    "aime2025": "maa.org", "hmmt2025": "hmmt.org",
 }
 
 rows = sorted(json.loads((ROOT / "results/summary.json").read_text(encoding="utf-8")), key=lambda r: -r["rate"])
-rows = [r for r in rows if r["flawed"]]  # 0% bars carry no information on a phone
 vals = [100 * r["rate"] for r in rows]
 
 plt.rcParams["font.family"] = ["Segoe UI", "DejaVu Sans"]
@@ -38,10 +38,10 @@ for i, r in enumerate(rows):
         ax.add_patch(plt.Rectangle((i - w / 2, -2), w, wrong + 2, fc=BAR, ec="none"))
         if wrong < v:  # 2px gap between the two shades
             ax.plot([i - w / 2, i + w / 2], [wrong, wrong], color=BG, lw=2, solid_capstyle="butt")
-    ax.text(i, v + 0.4, f"{v:.0f}%" if v >= 1 else f"{v:.1f}%", ha="center", va="bottom",
+    ax.text(i, v + 0.4, f"{v:.0f}%" if v >= 1 or v == 0 else f"{v:.1f}%", ha="center", va="bottom",
             color=INK, fontsize=21, fontweight="semibold")
 
-ax.set_xlim(-0.6, len(vals) + 0.05)
+ax.set_xlim(-0.6, len(vals) + 0.6)
 ax.set_ylim(0, 23)
 ax.set_xticks([])
 ax.set_yticks([])
@@ -92,7 +92,7 @@ fig.text(0.04, 0.9, "What % of each AI benchmark is broken", color=INK, fontsize
 for x, c, label in ((0.042, BAR, "Wrong answer"), (0.19, SOFT, "Unclear question or unfair test")):
     fig.patches.append(plt.Rectangle((x, 0.842), 0.012, 0.022, transform=fig.transFigure, fc=c, ec="none"))
     fig.text(x + 0.018, 0.853, label, color=INK, fontsize=17, va="center")
-fig.text(0.04, 0.03, "Samples of 86 to 164 items each. Audited by Claude, cross-checked by Codex. A lower bound.", color=MUTED, fontsize=14)
+fig.text(0.04, 0.03, "Samples of 30 to 164 items each. Audited by Claude, cross-checked by Codex. A lower bound.", color=MUTED, fontsize=14)
 fig.text(0.975, 0.03, "enesyilmazcode.github.io/benchbench", color=MUTED, fontsize=14, ha="right")
 fig.subplots_adjust(left=0.04, right=0.98, top=0.8, bottom=0.3)
 fig.savefig(ROOT / "post/benchbench-chart.png", facecolor=BG)

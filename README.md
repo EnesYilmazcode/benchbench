@@ -6,7 +6,7 @@ Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answe
 
 ![Share of sampled items found broken in each benchmark](post/benchbench-chart.png)
 
-Dark red is a provably wrong answer key. Light red is everything else that counts as broken: an ambiguous or unanswerable question, or a test that rejects a reasonable answer. Those are judgment calls by the reviewers, each with its reasoning on the report page. The chart leaves out MATH-500, AIME 2025 and HMMT 2025 because nothing in them was found broken; they are in the table below.
+Dark red is a provably wrong answer key. Light red is everything else that counts as broken: an ambiguous or unanswerable question, or a test that rejects a reasonable answer. Those are judgment calls by the reviewers, each with its reasoning on the report page. MATH-500, AIME 2025 and HMMT 2025 show 0% because nothing in them was found broken.
 
 ## Results
 
