@@ -60,10 +60,10 @@ def _copytree(workdir, trees):
         shutil.copytree(src, Path(workdir) / rel, dirs_exist_ok=True)
 
 
-def _claude(prompt, schema, model, effort, tools, workdir, timeout):
+def _claude(prompt, schema, model, effort, tools, workdir, timeout, system=SYSTEM):
     cmd = [CLAUDE, "-p", "--model", model, "--effort", effort, "--output-format", "json",
            "--json-schema", json.dumps(schema), "--tools", ",".join(tools) if tools else "",
-           "--system-prompt", SYSTEM, "--no-session-persistence", "--strict-mcp-config",
+           "--system-prompt", system, "--no-session-persistence", "--strict-mcp-config",
            "--setting-sources", "", "--disable-slash-commands", "--permission-mode", "bypassPermissions"]
     r = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8", errors="replace",
                        cwd=workdir, timeout=timeout)
@@ -78,7 +78,7 @@ def _claude(prompt, schema, model, effort, tools, workdir, timeout):
                                       "ms": out.get("duration_ms"), "out_tokens": usage.get("output_tokens")}
 
 
-def _codex(prompt, schema, model, effort, tools, workdir, timeout):
+def _codex(prompt, schema, model, effort, tools, workdir, timeout, system=SYSTEM):
     sfile = Path(workdir) / ".schema.json"
     ofile = Path(workdir) / ".answer.json"
     sfile.write_text(json.dumps(schema), encoding="utf-8")
@@ -89,7 +89,7 @@ def _codex(prompt, schema, model, effort, tools, workdir, timeout):
            "-c", "windows.sandbox=unelevated",  # without it the Windows sandbox blocks every shell command
            "--output-schema", str(sfile), "-o", str(ofile), "-"]
     t0 = time.time()
-    r = subprocess.run(cmd, input=SYSTEM + "\n\n" + prompt, capture_output=True, text=True, encoding="utf-8",
+    r = subprocess.run(cmd, input=system + "\n\n" + prompt, capture_output=True, text=True, encoding="utf-8",
                        errors="replace", cwd=workdir, timeout=timeout)
     if not ofile.exists():
         raise AgentError(f"codex exit {r.returncode}: {(r.stderr or r.stdout)[-400:]}")
@@ -178,11 +178,11 @@ _SLOTS["gw"] = threading.BoundedSemaphore(int(os.environ.get("BB_GW_JOBS", "12")
 _SLOTS["sonnet"] = threading.BoundedSemaphore(int(os.environ.get("BB_SONNET_JOBS", "6")))
 
 
-def ask(who, prompt, schema, *, effort="medium", tools=(), files=None, trees=None, timeout=900, tag="", retries=2, model=None):
-    """One auditor call. `tools` for claude are tool names; for codex, "web" and/or "write" switch those on."""
+def ask(who, prompt, schema, *, effort="medium", tools=(), files=None, trees=None, timeout=900, tag="", retries=2, model=None, system=None):
+    """One auditor call. `system` replaces the auditor system prompt (claude and codex only). `tools` for claude are tool names; for codex, "web" and/or "write" switch those on."""
     model = model or MODELS[who]
     key = _key(who, model, effort, sorted(tools), prompt, schema, sorted((files or {}).items()),
-               sorted((trees or {}).keys()), *(["shell-v2"] if who == "codex" and (files or trees) else []))
+               sorted((trees or {}).keys()), *([system] if system else []), *(["shell-v2"] if who == "codex" and (files or trees) else []))
     cp = CACHE / key[:2] / f"{key}.json"
     if cp.exists():
         return json.loads(cp.read_text(encoding="utf-8"))["answer"]
@@ -193,7 +193,7 @@ def ask(who, prompt, schema, *, effort="medium", tools=(), files=None, trees=Non
             try:
                 _seed(wd, files)
                 _copytree(wd, trees)
-                ans, stats = RUNNERS[who](prompt, schema, model, effort, list(tools), wd, timeout)
+                ans, stats = RUNNERS[who](prompt, schema, model, effort, list(tools), wd, timeout, **({"system": system} if system else {}))
                 break
             except (AgentError, subprocess.TimeoutExpired) as e:
                 last = e
