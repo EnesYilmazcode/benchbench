@@ -8,21 +8,24 @@ Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answe
 
 | Benchmark | Audited | Broken | Rate | 95% CI | Weak tests |
 |---|---:|---:|---:|---|---:|
-| SWE-bench Verified | 100 | 15 | 15.0% | 9.3% to 23.3% | |
-| MMLU-Pro | 150 | 17 | 11.3% | 7.2% to 17.4% | |
+| MBPP (sanitized) | 150 | 31 | 20.7% | 15.0% to 27.8% | 52.0% |
+| Terminal-Bench 2.0 | 86 | 17 | 19.8% | 12.7% to 29.4% | 22.1% |
+| SWE-bench Verified | 100 | 15 | 15.0% | 9.3% to 23.3% |  |
+| MMLU-Pro | 150 | 17 | 11.3% | 7.2% to 17.4% |  |
 | HumanEval | 164 | 14 | 8.5% | 5.2% to 13.8% | 77.4% |
-| SimpleQA | 150 | 7 | 4.7% | 2.3% to 9.3% | |
-| tau2-bench | 150 | 6 | 4.0% | 1.8% to 8.5% | |
-| MMLU | 150 | 3 | 2.0% | 0.7% to 5.7% | |
-| GSM8K | 150 | 3 | 2.0% | 0.7% to 5.7% | |
-| HellaSwag | 150 | 1 | 0.7% | 0.1% to 3.7% | |
-| MATH-500 | 150 | 0 | 0.0% | 0.0% to 2.5% | |
-| AIME 2025 | 30 | 0 | 0.0% | 0.0% to 11.4% | |
-| HMMT February 2025 | 30 | 0 | 0.0% | 0.0% to 11.4% | |
+| SimpleQA | 150 | 7 | 4.7% | 2.3% to 9.3% |  |
+| tau2-bench | 150 | 6 | 4.0% | 1.8% to 8.5% |  |
+| MMLU | 150 | 3 | 2.0% | 0.7% to 5.7% |  |
+| GSM8K | 150 | 3 | 2.0% | 0.7% to 5.7% |  |
+| SWE-bench Pro | 100 | 2 | 2.0% | 0.6% to 7.0% | 1.0% |
+| HellaSwag | 150 | 1 | 0.7% | 0.1% to 3.7% |  |
+| MATH-500 | 150 | 0 | 0.0% | 0.0% to 2.5% |  |
+| AIME 2025 | 30 | 0 | 0.0% | 0.0% to 11.4% |  |
+| HMMT February 2025 | 30 | 0 | 0.0% | 0.0% to 11.4% |  |
 
-Still running: Terminal-Bench 2, SWE-bench Pro and MBPP. They join the table when every sampled item is audited. A partial benchmark is never reported.
+A benchmark joins the table only when every sampled item is audited. The one exception is named in the code: three Terminal-Bench tasks (query-optimize, regex-chess, rstan-to-pystan) where the auditors tried to solve the task outright and ran past 40 minutes twice, so Terminal-Bench is 86 of 89.
 
-"Broken" means a wrong key, an ambiguous or unanswerable item, or a grader that rejects correct answers. "Weak tests" is measured, not judged: the share of deliberately buggy solutions that pass the official tests and still print a different result from the reference on a valid input.
+"Broken" means a wrong key, an ambiguous or unanswerable item, or a grader that rejects correct answers. "Weak tests" is the share of items whose tests accept a plausible wrong solution. For HumanEval and MBPP it is measured, not judged: deliberately buggy solutions pass the official tests and still print a different result from the reference on a valid input. For Terminal-Bench and SWE-bench Pro it is the reviewers' verdict after reading the tests.
 
 The full report, with every finding and the reasons behind it, is `docs/index.html`. Every flagged item is in `results/findings.jsonl`.
 
@@ -43,7 +46,7 @@ The full report, with every finding and the reasons behind it, is `docs/index.ht
 3. **Judge.** When the two disagree, Opus at its highest effort reads both reviews, checks their claims and decides. An item counts as broken only if both reviewers or the judge say so.
 4. **Run the code.** For HumanEval and MBPP the official tests run on Modal against the reference, two independent solutions and two deliberately buggy ones.
 5. **Read the tasks.** SWE-bench, Terminal-Bench and tau2 are reviewed with the real files in the auditor's folder: the issue, gold patch and tests; the task folder; or the domain policy, database and tool code.
-6. **Cross-check.** Every broken verdict on a question or task also goes to Codex (GPT-5.6), which sees the evidence but not the verdicts. So far it agrees with 56 of 66 flags, calls 5 of them correct, and is unsure on 5.
+6. **Cross-check.** Every broken verdict on a question or task also goes to Codex (GPT-5.6), which sees the evidence but not the verdicts. It voted on 114 of the 116 flags (it hit its usage limit on the last two): it agrees with 85, calls 9 correct, and is unsure on 20, all of them Terminal-Bench (15) or tau2 (5) tasks. Codex would not commit on any Terminal-Bench flag, so that row rests on the two Claude reviewers alone.
 
 ## Check the checker
 
