@@ -4,6 +4,8 @@ A benchmark for benchmarks. It audits the questions, answer keys and tests of po
 
 Benchmark scores get quoted to a tenth of a point. If 10% of a benchmark's answer keys are wrong, that tenth means nothing. benchbench takes a random sample of each benchmark, has two Claude models solve and review every item without seeing each other's work, runs the code where there is code, and asks a model from another lab to check every flag.
 
+![Share of sampled items found broken in each benchmark](post/benchbench-chart.png)
+
 ## Results
 
 | Benchmark | Audited | Broken | Rate | 95% CI | Weak tests |
